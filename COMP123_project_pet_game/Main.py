@@ -3,7 +3,6 @@ from tkinter import messagebox
 import random
 
 
-
 class PetGameApp:
     def __init__(self):
         self.rootWin = tk.Tk()
@@ -16,11 +15,13 @@ class PetGameApp:
         self.remaining_actions = 3
         self.event_triggered = False
 
+        # Pet images
         self.pet_images = {
             "default": tk.PhotoImage(file="pic/cat.png"),
             "style1": tk.PhotoImage(file="pic/cat2.png"),
             "style2": tk.PhotoImage(file="pic/cat3.png")
         }
+
         self.pet_state = {
             "happy": tk.PhotoImage(file="pic/happycat.png"),
             "happy2": tk.PhotoImage(file="pic/happycat2.png"),
@@ -29,15 +30,20 @@ class PetGameApp:
             "sad2": tk.PhotoImage(file="pic/sadcat2.png"),
             "sad3": tk.PhotoImage(file="pic/sadcat3.png"),
         }
+
         self.pet_image_key = "default"
+
+        # Enemy images
         self.enemy_images_normal = {
             "enemy1": tk.PhotoImage(file="pic/enemy1.png"),
             "enemy2": tk.PhotoImage(file="pic/paul.png"),
         }
+
         self.enemy_images_boss = {
             "enemy3": tk.PhotoImage(file="pic/enemy3.png")
         }
 
+        # Background colors
         self.bg_default = "light yellow"
         self.bg_event_positive = "light green"
         self.bg_event_negative = "light coral"
@@ -48,57 +54,41 @@ class PetGameApp:
         self.clear_window()
         self.rootWin.config(bg=self.bg_default)
 
-        self.title_label = tk.Label(self.rootWin, text="Pet Game", fg='black', bg='light blue',
-                                    font='Phosphate 95', pady=10, justify=tk.CENTER)
-        self.title_label.grid(row=0, column=0, columnspan=2, pady=20)
+        tk.Label(self.rootWin, text="Pet Game", fg='black', bg='light blue',
+                 font='Phosphate 95', pady=10, justify=tk.CENTER).grid(row=0, column=0, columnspan=2, pady=20)
 
-        self.start_button = tk.Button(self.rootWin, text="Start Game", font='Times 30', command=self.create_game_page)
-        self.start_button.grid(row=1, column=0, columnspan=2, pady=20)
+        tk.Button(self.rootWin, text="Start Game", font='Times 30', command=self.create_game_page).grid(
+            row=1, column=0, columnspan=2, pady=20)
 
-        self.quit_button = tk.Button(self.rootWin, text="Quit", font="Times 30", command=self.quit_game)
-        self.quit_button.grid(row=2, column=0, columnspan=2, pady=20)
+        tk.Button(self.rootWin, text="Quit", font="Times 30", command=self.quit_game).grid(
+            row=2, column=0, columnspan=2, pady=20)
 
     def create_game_page(self):
         self.clear_window()
-        #self.remaining_actions = 3
-        self.event_triggered = False
-
         self.rootWin.config(bg=self.bg_default)
+        self.event_triggered = False
 
         self.health_label = tk.Label(self.rootWin, text=f"Health: {self.pet_health}", font="Courier 30", bg=self.bg_default)
         self.health_label.grid(row=0, column=0, pady=10)
 
-        self.happiness_label = tk.Label(self.rootWin, text=f"Happiness: {self.pet_happiness}", font="Courier 30",
-                                        bg=self.bg_default)
+        self.happiness_label = tk.Label(self.rootWin, text=f"Happiness: {self.pet_happiness}", font="Courier 30", bg=self.bg_default)
         self.happiness_label.grid(row=0, column=1, pady=10)
 
-        self.actions_label = tk.Label(self.rootWin, text=f"Remaining Actions: {self.remaining_actions}", font="Courier 15",
-                                       bg=self.bg_default)
+        self.actions_label = tk.Label(self.rootWin, text=f"Remaining Actions: {self.remaining_actions}", font="Courier 15", bg=self.bg_default)
         self.actions_label.grid(row=1, column=0, columnspan=2, pady=10)
 
         self.pet_label = tk.Label(self.rootWin, image=self.pet_images[self.pet_image_key], bg=self.bg_default)
         self.pet_label.grid(row=2, column=0, columnspan=2, pady=20)
 
-        self.feed_button = tk.Button(self.rootWin, text="Feed", font="Courier 20", command=self.feed_pet)
-        self.feed_button.grid(row=3, column=0, pady=10)
+        tk.Button(self.rootWin, text="Feed", font="Courier 20", command=self.feed_pet).grid(row=3, column=0, pady=10)
+        tk.Button(self.rootWin, text="Play", font="Courier 20", command=self.play_with_pet).grid(row=3, column=1, pady=10)
 
-        self.play_button = tk.Button(self.rootWin, text="Play", font="Courier 20", command=self.play_with_pet)
-        self.play_button.grid(row=3, column=1, pady=10)
+        tk.Button(self.rootWin, text="Dressing Room", font="Courier 20", command=self.create_dressing_room_page).grid(row=4, column=0, pady=10)
+        tk.Button(self.rootWin, text="Battle Room", font="Courier 20", command=self.battle_haha).grid(row=4, column=1, pady=10)
 
-        self.dressing_room_button = tk.Button(self.rootWin, text="Dressing Room", font="Courier 20",
-                                               command=self.create_dressing_room_page)
-        self.dressing_room_button.grid(row=4, column=0, pady=10)
+        tk.Button(self.rootWin, text="Next Day", font="Courier 20", command=self.next_day).grid(row=5, column=0, columnspan=2, pady=10)
 
-        self.battle_room_button = tk.Button(self.rootWin, text="Battle Room", font="Courier 20",
-                                             command=self.battle_haha)
-        self.battle_room_button.grid(row=4, column=1, pady=10)
-
-        self.next_day_button = tk.Button(self.rootWin, text="Next Day", font="Courier 20", command=self.next_day)
-        self.next_day_button.grid(row=5, column=0, columnspan=2, pady=10)
-
-        self.back_button = tk.Button(self.rootWin, text="Back to Main Menu", font="Courier 15",
-                                     command=self.create_start_page)
-        self.back_button.grid(row=6, column=0, columnspan=2, pady=20)
+        tk.Button(self.rootWin, text="Back to Main Menu", font="Courier 15", command=self.create_start_page).grid(row=6, column=0, columnspan=2, pady=20)
 
         self.update_status()
 
@@ -126,57 +116,52 @@ class PetGameApp:
     def create_battle_room_page(self):
         self.clear_window()
         choose_normal = random.random() > 0.2
+
         if choose_normal:
-            enemy = random.choice(list(self.enemy_images_normal.keys()))
-            enemy_image = self.enemy_images_normal[enemy]
-            tk.Label(self.rootWin, text="Battle Room", font="Courier 30 bold", bg="light yellow").pack(pady=10)
-            tk.Label(self.rootWin, text="Enemy Appeared!", font="Courier 20", bg="light yellow").pack(pady=5)
-            tk.Label(self.rootWin, image=enemy_image, bg="light yellow").pack(pady=10)
-            self.battle_result_label = tk.Label(self.rootWin, text="", font="Courier 15", bg="light yellow")
-            self.battle_result_label.pack(pady=5)
-            self.battle_button = tk.Button(self.rootWin, text="Attack!", font="Courier 20",
-                                           command=self.attack_enemy_normal)
-            self.battle_button.pack(pady=10)
+            enemy_image = self.enemy_images_normal[random.choice(list(self.enemy_images_normal.keys()))]
+            bg_color = self.bg_default
+            title = "Enemy Appeared!"
+            attack_command = self.attack_enemy_normal
+            font_size = 20
         else:
-            enemy = random.choice(list(self.enemy_images_boss.keys()))
-            enemy_image = self.enemy_images_boss[enemy]
-            tk.Label(self.rootWin, text="Battle Room", font="Courier 30 bold", bg="light pink").pack(pady=10)
-            tk.Label(self.rootWin, text="Oh! The Boss comes!", font="Courier 20", bg="light pink").pack(pady=5)
-            tk.Label(self.rootWin, image=enemy_image, bg="light pink").pack(pady=10)
-            self.battle_result_label = tk.Label(self.rootWin, text="", font="Courier 15", bg="light pink")
-            self.battle_result_label.pack(pady=5)
-            self.battle_button = tk.Button(self.rootWin, text="Attack!", font="Courier 35",
-                                           command=self.attack_enemy_boss)
-            self.battle_button.pack(pady=10)
+            enemy_image = self.enemy_images_boss[random.choice(list(self.enemy_images_boss.keys()))]
+            bg_color = "light pink"
+            title = "Oh! The Boss comes!"
+            attack_command = self.attack_enemy_boss
+            font_size = 35
+
+        self.rootWin.config(bg=bg_color)
+        tk.Label(self.rootWin, text="Battle Room", font="Courier 30 bold", bg=bg_color).pack(pady=10)
+        tk.Label(self.rootWin, text=title, font="Courier 20", bg=bg_color).pack(pady=5)
+        tk.Label(self.rootWin, image=enemy_image, bg=bg_color).pack(pady=10)
+
+        self.battle_result_label = tk.Label(self.rootWin, text="", font="Courier 15", bg=bg_color)
+        self.battle_result_label.pack(pady=5)
+
+        self.battle_button = tk.Button(self.rootWin, text="Attack!", font=f"Courier {font_size}", command=attack_command)
+        self.battle_button.pack(pady=10)
 
         tk.Button(self.rootWin, text="Back", font="Courier 20", command=self.create_game_page).pack(pady=20)
 
     def attack_enemy_normal(self):
-        success = random.random() > 0.3
-        if success:
+        if random.random() > 0.3:
             self.pet_happiness = min(self.pet_happiness + 20, 100)
             self.pet_health = min(self.pet_health + 10, 100)
             self.battle_result_label.config(text="You Win! Happiness +20, Health +10", fg="dark green")
         else:
             self.pet_health = max(self.pet_health - 10, 0)
             self.battle_result_label.config(text="You Lose! Health -10", fg="red")
-
-        if hasattr(self, "battle_button"):
-            self.battle_button["state"] = tk.DISABLED
+        self.battle_button.config(state=tk.DISABLED)
 
     def attack_enemy_boss(self):
-        success = random.random() > 0.7
-        if success:
+        if random.random() > 0.7:
             self.pet_happiness = min(self.pet_happiness + 50, 100)
             self.pet_health = min(self.pet_health + 20, 100)
             self.battle_result_label.config(text="You Beat the Boss! Happiness +50, Health +20", fg="green")
         else:
             self.pet_health = max(self.pet_health - 15, 0)
             self.battle_result_label.config(text="You Lose! OMG! Health -15", fg="red")
-
-        if hasattr(self, "battle_button"):
-            self.battle_button["state"] = tk.DISABLED
-
+        self.battle_button.config(state=tk.DISABLED)
         self.update_status()
 
     def feed_pet(self):
@@ -201,9 +186,7 @@ class PetGameApp:
 
     def update_action_label(self):
         if hasattr(self, "actions_label"):
-            self.actions_label["text"] = f"Remaining Actions: {self.remaining_actions}"
-
-
+            self.actions_label.config(text=f"Remaining Actions: {self.remaining_actions}")
 
     def next_day(self):
         self.remaining_actions = 3
@@ -222,48 +205,18 @@ class PetGameApp:
 
     def update_status(self):
         if hasattr(self, "health_label") and hasattr(self, "happiness_label"):
-            self.health_label["text"] = f"Health: {self.pet_health}"
-            self.happiness_label["text"] = f"Happiness: {self.pet_happiness}"
-
-        #if self.pet_happiness >= 80:
-        #    self.pet_image_key = "happy"
-        #else:
-        #    self.pet_image_key = "default"
-
-        #if hasattr(self, "pet_label"):
-        #    self.pet_label.config(image=self.pet_images[self.pet_image_key])
-
-        '''
-        if self.pet_image_key == "default":
-            if self.pet_happiness >= 80:
-                self.pet_image_key = "happy"
-            if self.pet_happiness >= 20:
-                self.pet_image_key = "sad"
-            else:
-                self.pet_image_key = "default"
-        if self.pet_image_key == "style1":
-            if self.pet_happiness >= 80:
-                self.pet_image_key = "happy2"
-            if self.pet_happiness >= 20:
-                self.pet_image_key = "sad2"
-        if self.pet_image_key == "style2":
-            if self.pet_happiness >= 80:
-                self.pet_image_key = "happy3"
-            if self.pet_happiness >= 20:
-                self.pet_image_key = "sad3"
-
-        if hasattr(self, "pet_label"):
-            self.pet_label.config(image=self.pet_images[self.pet_image_key])
-        '''
+            self.health_label.config(text=f"Health: {self.pet_health}")
+            self.happiness_label.config(text=f"Happiness: {self.pet_happiness}")
 
     def toggle_image(self):
-        if self.pet_image_key == 'default':
-            self.pet_label.config(image=self.pet_state["happy"])
-        if self.pet_image_key == 'style1':
-            self.pet_label.config(image=self.pet_state["happy2"])
-        if self.pet_image_key == 'style2':
-            self.pet_label.config(image=self.pet_state["happy3"])
-        self.pet_label.after(1000, lambda: self.pet_label.config(image=self.pet_images[self.pet_image_key]))
+        key_map = {
+            "default": "happy",
+            "style1": "happy2",
+            "style2": "happy3"
+        }
+        if self.pet_image_key in key_map:
+            self.pet_label.config(image=self.pet_state[key_map[self.pet_image_key]])
+            self.pet_label.after(1000, lambda: self.pet_label.config(image=self.pet_images[self.pet_image_key]))
 
     def quit_game(self):
         self.rootWin.destroy()
