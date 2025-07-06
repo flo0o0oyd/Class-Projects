@@ -1,0 +1,144 @@
+---
+title: "155Project"
+author: "Floyd Liu"
+date: "2024-03-22"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r,warning=FALSE,message=FALSE}
+library(ggplot2)
+library(dplyr)
+```
+
+
+###Name of the variables
+
+```{r}
+print(names(merged_data_82))
+```
+###Research on Price
+
+```{r}
+Price_rice = merged_data_82$Price_rice_per_kg
+Price_beer = merged_data_82$Price_beer
+Price_water = merged_data_82$Price_water_per_bottle
+Price_cig = merged_data_82$Price_cig_20_pack
+Price_cheese = merged_data_82$Price_cheese_per_kg
+Price_egg = merged_data_82$Price_eggs_dozen
+Price_milk = merged_data_82$Price_milk_per_liter
+Price_bread = merged_data_82$Price_bread_halfkg
+```
+
+Range of the Price, normalization of the price:
+
+```{r}
+range(Price_rice)
+range(Price_beer)
+range(Price_water)
+range(Price_cig)
+range(Price_cheese)
+range(Price_egg)
+range(Price_milk)
+range(Price_bread)
+U_rice = Price_rice/(4.56-0.63)
+U_beer = Price_beer/(8.27-0.45)
+U_water = Price_water/(2.46-0.17)
+U_cig = Price_cig/(29.15-0.5)
+U_cheese = Price_cheese/(27.26-1.37)
+U_egg = Price_egg/(6.88-0.79)
+U_milk = Price_milk/(3.39-0.46)
+U_bread = Price_bread/(3.56-0.16)
+```
+Graph 1: Normalized price:
+
+
+```{r}
+par(mfrow=c(1,8))
+boxplot(U_rice)
+boxplot(U_beer)
+boxplot(U_water)
+boxplot(U_cig)
+boxplot(U_cheese)
+boxplot(U_egg)
+boxplot(U_milk)
+boxplot(U_bread)
+par(mfrow=c(1,1))
+boxplot(U_rice,U_beer,U_water,U_cig,U_cheese,U_egg,U_milk,U_bread,
+main = "Unified price of different products",
+ylab = "Price",
+# names = c("Price of rice (1kg)", "Price of imported beer", "Price of water (1.5 liter)", "Price of cigarettes (20 packs)", "Price of cheese (1kg)", "Price of egg (a dozen)", "Price of milk (1 liter)", "Price of white bread (500 grams)"))
+names = c("Rice", "Beer", "Water", "Cig", "Cheese", "Egg", "Milk", "Bread"))
+```
+
+
+Simple linear model (Cost of living vs. Price):
+
+```{r}
+ggplot(merged_data_82, aes(x = Cost_of_Living_Index, y = Price_rice_per_kg)) +
+  geom_point()
+```
+
+```{r}
+ggplot(merged_data_82, aes(x = Cost_of_Living_Index, y = Price_beer)) +
+  geom_point()
+```
+
+```{r}
+ggplot(merged_data_82, aes(x = Cost_of_Living_Index, y = Price_water_per_bottle)) +
+  geom_point()
+```
+
+
+###Research on Macro data
+
+
+```{r}
+ggplot(merged_data_82, aes(x = GDP_per_capita_2022_Usdollar, y = Cost_of_Living_Index)) +
+  ggtitle("Relationship between GDP per capita and Cost of living index") +  
+  xlab("GDP per capita") +
+  ylab("Cost of living index") +
+  geom_point()
+```
+
+```{r}
+ggplot(merged_data_82, aes(x = GDP_2022_Usdollar, y = Cost_of_Living_Index)) +
+ ggtitle("Relationship between GDP and Cost of living index") +  
+  xlab("GDP") +
+  ylab("Cost of living index") +
+  geom_point()
+```
+
+```{r}
+ggplot(merged_data_82, aes(x = GNI_2022_Usdollar, y = Cost_of_Living_Index)) +
+  ggtitle("Relationship between GNI and Cost of living index") +  
+  xlab("GNI") +
+  ylab("Cost of living index") +
+  geom_point()
+```
+
+```{r}
+ggplot(merged_data_82, aes(x = GNI_per_capita_2022, y = Cost_of_Living_Index)) +
+  ggtitle("Relationship between GNI per capita and Cost of living index") +  
+  xlab("GNI per capita") +
+  ylab("Cost of living index") +
+  geom_point()
+```
+
+```{r}
+ggplot(merged_data_82, aes(x = `2022_PPP_Internationaldollar`, y = Cost_of_Living_Index)) +
+  ggtitle("Relationship between PPP and Cost of living index") +  
+  xlab("PPP") +
+  ylab("Cost of living index") +
+  xlim(0,10000000000000/2) +
+  geom_point()
+```
+
+```{r}
+ggplot(merged_data_82, aes(x = `2022_Import_percentofGDP(%)`, y = Cost_of_Living_Index)) +
+  geom_point()
+```
+
+
+
