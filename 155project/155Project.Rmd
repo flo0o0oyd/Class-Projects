@@ -1,40 +1,37 @@
 ---
-title: "155Project"
+title: "155 Project"
 author: "Floyd Liu"
 date: "2024-03-22"
 output: html_document
-editor_options: 
+editor_options:
   chunk_output_type: inline
 ---
 
-```{r,warning=FALSE,message=FALSE}
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
 library(ggplot2)
 library(dplyr)
 ```
 
-
-###Name of the variables
-
-```{r}
-print(names(merged_data_82))
-```
-###Research on Price
+# Load Data
 
 ```{r}
-Price_rice = merged_data_82$Price_rice_per_kg
-Price_beer = merged_data_82$Price_beer
-Price_water = merged_data_82$Price_water_per_bottle
-Price_cig = merged_data_82$Price_cig_20_pack
-Price_cheese = merged_data_82$Price_cheese_per_kg
-Price_egg = merged_data_82$Price_eggs_dozen
-Price_milk = merged_data_82$Price_milk_per_liter
-Price_bread = merged_data_82$Price_bread_halfkg
+merged_data <- read.csv("merged_data_82.csv")
+print(names(merged_data))
 ```
 
-Range of the Price, normalization of the price:
+# Prepare and Normalize Price Variables
 
 ```{r}
-range(Price_rice)
+price_rice   <- merged_data$Price_rice_per_kg
+price_beer   <- merged_data$Price_beer
+price_water  <- merged_data$Price_water_per_bottle
+price_cig    <- merged_data$Price_cig_20_pack
+price_cheese <- merged_data$Price_cheese_per_kg
+price_egg    <- merged_data$Price_eggs_dozen
+price_milk   <- merged_data$Price_milk_per_liter
+price_bread  <- merged_data$Price_bread_halfkg
+
+#Get range
 range(Price_beer)
 range(Price_water)
 range(Price_cig)
@@ -42,103 +39,153 @@ range(Price_cheese)
 range(Price_egg)
 range(Price_milk)
 range(Price_bread)
-U_rice = Price_rice/(4.56-0.63)
-U_beer = Price_beer/(8.27-0.45)
-U_water = Price_water/(2.46-0.17)
-U_cig = Price_cig/(29.15-0.5)
-U_cheese = Price_cheese/(27.26-1.37)
-U_egg = Price_egg/(6.88-0.79)
-U_milk = Price_milk/(3.39-0.46)
-U_bread = Price_bread/(3.56-0.16)
-```
-Graph 1: Normalized price:
 
-
-```{r}
-par(mfrow=c(1,8))
-boxplot(U_rice)
-boxplot(U_beer)
-boxplot(U_water)
-boxplot(U_cig)
-boxplot(U_cheese)
-boxplot(U_egg)
-boxplot(U_milk)
-boxplot(U_bread)
-par(mfrow=c(1,1))
-boxplot(U_rice,U_beer,U_water,U_cig,U_cheese,U_egg,U_milk,U_bread,
-main = "Unified price of different products",
-ylab = "Price",
-# names = c("Price of rice (1kg)", "Price of imported beer", "Price of water (1.5 liter)", "Price of cigarettes (20 packs)", "Price of cheese (1kg)", "Price of egg (a dozen)", "Price of milk (1 liter)", "Price of white bread (500 grams)"))
-names = c("Rice", "Beer", "Water", "Cig", "Cheese", "Egg", "Milk", "Bread"))
+# Normalize using observed max-min
+price_rice_scaled   <- price_rice / (4.56 - 0.63)
+price_beer_scaled   <- price_beer / (8.27 - 0.45)
+price_water_scaled  <- price_water / (2.46 - 0.17)
+price_cig_scaled    <- price_cig / (29.15 - 0.5)
+price_cheese_scaled <- price_cheese / (27.26 - 1.37)
+price_egg_scaled    <- price_egg / (6.88 - 0.79)
+price_milk_scaled   <- price_milk / (3.39 - 0.46)
+price_bread_scaled  <- price_bread / (3.56 - 0.16)
 ```
 
-
-Simple linear model (Cost of living vs. Price):
+# Unified Price Boxplots
 
 ```{r}
-ggplot(merged_data_82, aes(x = Cost_of_Living_Index, y = Price_rice_per_kg)) +
-  geom_point()
+df_prices <- data.frame(
+  Rice   = price_rice_scaled,
+  Beer   = price_beer_scaled,
+  Water  = price_water_scaled,
+  Cig    = price_cig_scaled,
+  Cheese = price_cheese_scaled,
+  Egg    = price_egg_scaled,
+  Milk   = price_milk_scaled,
+  Bread  = price_bread_scaled
+)
+
+boxplot(df_prices,
+        main = "Normalized Prices of Products",
+        ylab = "Normalized Price",
+        las = 2,
+        col = "lightblue")
 ```
 
+# Cost of Living vs. Individual Product Price
+
 ```{r}
-ggplot(merged_data_82, aes(x = Cost_of_Living_Index, y = Price_beer)) +
-  geom_point()
+product_vars <- c("Price_rice_per_kg", "Price_beer", "Price_water_per_bottle", 
+                  "Price_eggs_dozen", "Price_cheese_per_kg", "Price_cig_20_pack", 
+                  "Price_milk_per_liter", "Price_bread_halfkg")
+
+par(mfrow = c(2, 4))
+for (var in product_vars) {
+  plot(merged_data[[var]], merged_data$Cost_of_Living_Index, 
+       xlab = var, ylab = "Cost of Living", main = paste("COL vs", var))
+}
+par(mfrow = c(1, 1))
 ```
 
+# Linear Model Summaries
+
 ```{r}
-ggplot(merged_data_82, aes(x = Cost_of_Living_Index, y = Price_water_per_bottle)) +
-  geom_point()
+models <- lapply(product_vars, function(var) {
+  formula <- as.formula(paste("Cost_of_Living_Index ~", var))
+  lm(formula, data = merged_data)
+})
+names(models) <- product_vars
+lapply(models, summary)
 ```
 
-
-###Research on Macro data
-
+# GNI and Cost of Living
 
 ```{r}
-ggplot(merged_data_82, aes(x = GDP_per_capita_2022_Usdollar, y = Cost_of_Living_Index)) +
-  ggtitle("Relationship between GDP per capita and Cost of living index") +  
-  xlab("GDP per capita") +
-  ylab("Cost of living index") +
-  geom_point()
-```
-
-```{r}
-ggplot(merged_data_82, aes(x = GDP_2022_Usdollar, y = Cost_of_Living_Index)) +
- ggtitle("Relationship between GDP and Cost of living index") +  
-  xlab("GDP") +
-  ylab("Cost of living index") +
-  geom_point()
-```
-
-```{r}
-ggplot(merged_data_82, aes(x = GNI_2022_Usdollar, y = Cost_of_Living_Index)) +
-  ggtitle("Relationship between GNI and Cost of living index") +  
-  xlab("GNI") +
-  ylab("Cost of living index") +
-  geom_point()
+ggplot(merged_data, aes(x = GNI_per_capita_2022, y = Cost_of_Living_Index)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(title = "GNI vs Cost of Living", x = "GNI per Capita", y = "Cost of Living Index")
 ```
 
 ```{r}
-ggplot(merged_data_82, aes(x = GNI_per_capita_2022, y = Cost_of_Living_Index)) +
-  ggtitle("Relationship between GNI per capita and Cost of living index") +  
-  xlab("GNI per capita") +
-  ylab("Cost of living index") +
-  geom_point()
+median_gni <- median(merged_data$GNI_per_capita_2022)
+merged_data$gni_group <- ifelse(merged_data$GNI_per_capita_2022 < median_gni, 
+                                 "Below Median", "Above Median")
+
+ggplot(merged_data, aes(x = GNI_per_capita_2022, y = Cost_of_Living_Index, color = gni_group)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "GNI (Above/Below Median) vs Cost of Living")
+```
+
+#R sequare for GNI
+
+```{r}
+model_null <- lm(Cost_of_Living_Index ~ 1, data = merged_data)
+model_gni <- lm(Cost_of_Living_Index ~ GNI_per_capita_2022, data = merged_data)
+r2 <- 1 - sum(resid(model_gni)^2) / sum(resid(model_null)^2)
+r2
+```
+
+# Cultural Region Interaction Models
+
+```{r}
+ggplot(merged_data, aes(x = Price_rice_per_kg, y = Cost_of_Living_Index, color = Cultural_Region)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, aes(linetype = Cultural_Region)) +
+  labs(title = "COL ~ Rice Price by Cultural Region")
 ```
 
 ```{r}
-ggplot(merged_data_82, aes(x = `2022_PPP_Internationaldollar`, y = Cost_of_Living_Index)) +
-  ggtitle("Relationship between PPP and Cost of living index") +  
-  xlab("PPP") +
-  ylab("Cost of living index") +
-  xlim(0,10000000000000/2) +
-  geom_point()
+model_culture <- lm(Cost_of_Living_Index ~ Price_rice_per_kg * Cultural_Region, data = merged_data)
+summary(model_culture)
 ```
+
+# Confounding Variable: GNI
 
 ```{r}
-ggplot(merged_data_82, aes(x = `2022_Import_percentofGDP(%)`, y = Cost_of_Living_Index)) +
-  geom_point()
+confound_models <- lapply(product_vars, function(var) {
+  formula <- as.formula(paste("Cost_of_Living_Index ~", var, "+ GNI_per_capita_2022"))
+  lm(formula, data = merged_data)
+})
+names(confound_models) <- product_vars
+lapply(confound_models, summary)
 ```
 
+# All Product Prices and GNI
 
+```{r}
+model_all <- lm(Cost_of_Living_Index ~ Price_rice_per_kg + Price_cig_20_pack + 
+                  Price_cheese_per_kg + Price_eggs_dozen + Price_milk_per_liter +
+                  Price_water_per_bottle + Price_bread_halfkg + Price_beer, 
+                data = merged_data)
 
+model_all_gni <- update(model_all, . ~ . + GNI_per_capita_2022)
+
+summary(model_all)
+summary(model_all_gni)
+```
+
+# Additional Macroeconomic Variables
+
+```{r}
+ggplot(merged_data, aes(x = GDP_per_capita_2022_Usdollar, y = Cost_of_Living_Index)) +
+  geom_point() +
+  labs(title = "GDP per Capita vs COL")
+
+ggplot(merged_data, aes(x = GDP_2022_Usdollar, y = Cost_of_Living_Index)) +
+  geom_point() +
+  labs(title = "GDP vs COL")
+
+ggplot(merged_data, aes(x = GNI_2022_Usdollar, y = Cost_of_Living_Index)) +
+  geom_point() +
+  labs(title = "GNI vs COL")
+
+ggplot(merged_data, aes(x = `2022_PPP_Internationaldollar`, y = Cost_of_Living_Index)) +
+  geom_point() +
+  labs(title = "PPP vs COL")
+
+ggplot(merged_data, aes(x = `2022_Import_percentofGDP(%)`, y = Cost_of_Living_Index)) +
+  geom_point() +
+  labs(title = "Import % of GDP vs COL")
+```
